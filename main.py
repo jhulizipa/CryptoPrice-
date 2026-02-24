@@ -8,7 +8,7 @@ import webserver
 TOKEN = os.getenv("TOKEN")
 
 # 📌 ID de tu canal (voz o texto)
-CHANNEL_ID = 1185451174665650252  # <-- CAMBIA ESTO por tu ID real
+CHANNEL_ID = 1185451174665650252  # Tu ID real
 
 intents = discord.Intents.default()
 client = discord.Client(intents=intents)
@@ -34,10 +34,13 @@ def obtener_icono(cambio):
 
 async def actualizar_canal():
     await client.wait_until_ready()
-    canal = client.get_channel(CHANNEL_ID)
 
-    if canal is None:
-        print("❌ No se encontró el canal. Revisa el CHANNEL_ID.")
+    # 🔥 CAMBIO CLAVE: fetch_channel en vez de get_channel (mejor para Render)
+    try:
+        canal = await client.fetch_channel(CHANNEL_ID)
+        print(f"✅ Canal encontrado: {canal.name}")
+    except Exception as e:
+        print("❌ Error obteniendo el canal:", e)
         return
 
     while not client.is_closed():
@@ -45,34 +48,36 @@ async def actualizar_canal():
             precio, cambio = obtener_datos_nxpc()
             icono = obtener_icono(cambio)
 
-            # Formato limpio
+            # Formato limpio y bonito
             precio = round(precio, 4)
             cambio = round(cambio, 2)
 
             nuevo_nombre = f"{icono} NXPC ${precio} | {cambio:+}%"
 
-            # Solo cambia el nombre si es diferente (evita rate limit de Discord)
+            # Evita rate limit (solo cambia si es diferente)
             if canal.name != nuevo_nombre:
                 await canal.edit(name=nuevo_nombre)
-                print(f"Actualizado: {nuevo_nombre}")
+                print(f"📊 Actualizado: {nuevo_nombre}")
             else:
-                print("Sin cambios en el precio")
+                print("⏳ Sin cambios en el precio")
 
         except Exception as e:
             print("⚠️ Error actualizando el canal:", e)
 
-        # ⏱️ 120 segundos = seguro para evitar límites de Discord
+        # ⏱️ 120 segundos = seguro para Discord
         await asyncio.sleep(120)
 
 @client.event
 async def on_ready():
-    print(f"✅ Bot conectado como {client.user}")
+    print(f"🤖 Bot conectado como {client.user}")
     client.loop.create_task(actualizar_canal())
 
-# 🚀 Iniciar bot
+# 🚀 Verificación del token
 if TOKEN is None:
-    raise ValueError("El TOKEN no está configurado en las variables de entorno.")
+    raise ValueError("❌ El TOKEN no está configurado en las variables de entorno en Render.")
 
-webserver.keep_alive()  # Iniciar el servidor web para mantener el bot activo
+# 🌐 Mantener el servicio activo en Render (Flask)
+webserver.keep_alive()
 
+# ▶️ Iniciar bot
 client.run(TOKEN)
