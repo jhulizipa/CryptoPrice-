@@ -1,8 +1,9 @@
 import discord
 import requests
 import asyncio
+import os
 
-TOKEN = "TU_TOKEN_AQUI"
+TOKEN = os.getenv("TOKEN")
 CHANNEL_ID = 123456789012345678  # ID de tu canal
 
 intents = discord.Intents.default()
@@ -50,5 +51,6 @@ async def actualizar_canal():
 async def on_ready():
     print(f"Bot conectado como {client.user}")
     client.loop.create_task(actualizar_canal())
+
 
 client.run(TOKEN)
