@@ -8,7 +8,7 @@ import webserver
 TOKEN = os.getenv("TOKEN")
 
 # 📌 ID de tu canal (voz o texto)
-CHANNEL_ID = 1475651071505334312  # <-- CAMBIA ESTO por tu ID real
+CHANNEL_ID = 1185451174665650252  # <-- CAMBIA ESTO por tu ID real
 
 intents = discord.Intents.default()
 client = discord.Client(intents=intents)
@@ -74,4 +74,5 @@ if TOKEN is None:
     raise ValueError("El TOKEN no está configurado en las variables de entorno.")
 
 webserver.keep_alive()  # Iniciar el servidor web para mantener el bot activo
+
 client.run(TOKEN)
